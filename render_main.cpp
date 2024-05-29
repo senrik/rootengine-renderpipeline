@@ -1,8 +1,6 @@
 #include <stdio.h>
 #include <math.h>
 #include <vector>
-#include "render_object.hpp"
-#include "Camera.hpp"
 #include <glad/glad.h> //manages function pointers for OpenGL
 #include <GLFW/glfw3.h> // Abstraction layer for targeting multiple systems with OpenGL
 #include <glm/glm.hpp>
@@ -10,8 +8,9 @@
 #include <glm/gtx/quaternion.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
-#include <ufbx.h>
-#include <stb_image.h> // image loader
+
+#include "Camera.hpp"
+#include "render_object.hpp"
 
 
 
@@ -111,7 +110,7 @@ int main(int argc, char* argv[]) {
 	};
 	
 
-	//RenderCache_Add(diamondVerts, 48, diamondIndices, 24, -1.0f, 0.5f, 0.0f);
+	RenderCache_Add(diamondVerts, 48, diamondIndices, 24, -1.0f, 0.5f, 0.0f);
 	
 #pragma endregion
 	
@@ -120,7 +119,7 @@ int main(int argc, char* argv[]) {
 	ufbx_load_opts opts = { 0 };
 	ufbx_error fbx_error;
 	
-	RenderCache_AddMesh("cv22_rig01_export08.fbx", &opts, &fbx_error);
+	//RenderCache_AddMesh("cv22_rig01_export08.fbx", &opts, &fbx_error);
 #pragma endregion
 	
 	RenderCache_Init();
@@ -237,7 +236,7 @@ void RenderCache_Add(const float* verts, unsigned int _vertCount, unsigned int* 
 		_mesh->textures = (Texture*)malloc(_mesh->textureSize);
 		for (int ti = 0; ti < _mesh->textureCount; ti++) {
 			Texture* _texture = &_mesh->textures[ti];
-			_texture->textureData = stbi_load("container.jpg", &_texture->t_width, &_texture->t_height, &_texture->nrChannels, 0);
+			_texture->textureData = stbi_load("./assets/container.jpg", &_texture->t_width, &_texture->t_height, &_texture->nrChannels, 0);
 		}
 		
 		Mesh_RawVertsInit(_mesh);
