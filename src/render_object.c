@@ -4,17 +4,15 @@ void Shader_Empty_Init(Shader* _shader) {
 	_shader->ID = -1;
 }
 
-void Shader_Init(Shader* _shader, const char* vertexPath, uint vlength, const char* fragmentPath, uint flength) {
+void Shader_Init(Shader* _shader, const char* vertexCode, uint vlength, const char* fragmentCode, uint flength) {
 
-	rt_string vertexCode = read_textfile(vertexPath);
-	rt_string fragmentCode = read_textfile(fragmentPath);
 
 	unsigned int vertex, fragment;
 	int success;
 	char infoLog[512];
 
 	vertex = glCreateShader(GL_VERTEX_SHADER);
-	glShaderSource(vertex, 1, &vertexCode.data, NULL);
+	glShaderSource(vertex, 1, vertexCode, NULL);
 	glCompileShader(vertex);
 	glGetShaderiv(vertex, GL_COMPILE_STATUS, &success);
 	if (!success) {
@@ -23,7 +21,7 @@ void Shader_Init(Shader* _shader, const char* vertexPath, uint vlength, const ch
 	}
 
 	fragment = glCreateShader(GL_FRAGMENT_SHADER);
-	glShaderSource(fragment, 1, &fragmentCode.data, NULL);
+	glShaderSource(fragment, 1, fragmentCode, NULL);
 	glCompileShader(fragment);
 	glGetShaderiv(fragment, GL_COMPILE_STATUS, &success);
 	if (!success) {
@@ -49,7 +47,7 @@ void Shader_Use(const Shader* _shader) {
 	glUseProgram(_shader->ID);
 }
 
-void Shader_setBool(const Shader* _shader, const char* name, bool value) {
+void Shader_setBool(const Shader* _shader, const char* name, const uint value) {
 	glUniform1i(glGetUniformLocation(_shader->ID, name), (int)value);
 }
 

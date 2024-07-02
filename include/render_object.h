@@ -4,9 +4,8 @@
 extern "C" {
 #endif
 #include <roots_math/roots_math.h>
-#include <asset_io.h>
+#include <data_types.h>
 #include <glad.h>
-
 typedef struct Shader {
 	uint ID;
 } Shader;
@@ -63,7 +62,7 @@ typedef struct RenderObj {
 void Shader_Empty_Init(Shader*);
 void Shader_Init(Shader*,const char*, uint, const char*, uint);
 void Shader_Use(const Shader*);
-void Shader_setBool(const Shader*, const char*, const uint, const bool );
+void Shader_setBool(const Shader*, const char*, const uint, const uint ); // last param is a a boolean
 void Shader_setInt(const Shader*, const char*, const uint, const int );
 void Shader_setFloat(const Shader*, const char*, const uint, const float );
 void Shader_setMat4(const Shader*, const char*, const uint, const rt_mat4 );

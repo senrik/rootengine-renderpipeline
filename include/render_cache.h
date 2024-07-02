@@ -6,6 +6,7 @@ extern "C" {
 #include <render_object.h>
 #define RENDER_CACHE_SIZE 200
 
+
 typedef struct RenderCache {
 	RenderObj* cache;
 	unsigned int cacheCount;

@@ -1,5 +1,8 @@
 #ifndef ROOTS_MATH_H
 #define ROOTS_MATH_H
+#ifdef __cplusplus
+extern "C" {
+#endif
 #include <math.h>
 
 
@@ -74,5 +77,7 @@ void mat4_translate(rt_mat4*, const rt_vec3*);
 rt_mat4 quat_to_mat4(const rt_quat*);
 rt_mat4 dot_product(const rt_mat4*, const rt_mat4*);
 rt_mat4 cross_product(const rt_mat4*, const rt_mat4*);
-
+#ifdef __cplusplus
+}
+#endif
 #endif // !ROOTS_MATH_H
