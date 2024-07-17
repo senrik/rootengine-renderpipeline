@@ -1,9 +1,10 @@
 #ifndef CAMERA_H
 #define CAMERA_H
+#include <roots_math.h>
 #ifdef __cplusplus
 extern "C" {
 #endif
-#include<roots_math/roots_math.h>
+
 
 typedef struct Camera {
 	rt_vec3 position, target, forwardAxis, rightAxis, upAxis;

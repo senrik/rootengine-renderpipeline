@@ -29,7 +29,9 @@ rt_mat4 Camera_GetViewMatrix(Camera* _cam) {
 	// We update the view matrix on this call because it only needs to be updated when it is needed.
 	mat4_init(&_cam->viewMat, 1.0f);
 	mat4_translate(&_cam->viewMat, &_cam->position);
-	_cam->viewMat = dot_product(quat_to_mat(_cam->rotation), &_cam->viewMat); // dot product
+	rt_mat4 _matRotation = quat_to_mat4(&_cam->rotation);
+
+	_cam->viewMat = dot_product(&_matRotation, &_cam->viewMat); // dot product
 	return _cam->viewMat;
 }
 
