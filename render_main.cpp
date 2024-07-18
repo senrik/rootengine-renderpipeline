@@ -34,7 +34,7 @@ int main(int argc, char* argv[]) {
 	RenderObj plane;
 	RenderObj_Init(&plane);
 	
-	RenderObj_AddMesh(&plane, defaultPlaneVerts, DEFAULT_PLANE_VERT_COUNT, defaultPlaneIndices, DEFAULT_PLANE_VERT_COUNT);
+	RenderObj_Add_Raw_Mesh(&plane, defaultPlaneVerts, DEFAULT_PLANE_VERT_COUNT, defaultPlaneIndices, DEFAULT_PLANE_VERT_COUNT);
 	RenderObj_Register(&plane);
 	float deltaTime = 0;
 	while (!glfwWindowShouldClose(window)) {
