@@ -173,7 +173,7 @@ void Mesh_Register(Mesh* _mesh) {
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
 
-	if (_mesh->textures[0].textureData != NULL) {
+	if (&_mesh->textures[0] != NULL &&_mesh->textures[0].textureData != NULL) {
 		glGenTextures(1, &_mesh->texture);
 		glBindTexture(GL_TEXTURE_2D, _mesh->texture);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
@@ -188,7 +188,7 @@ void Mesh_Register(Mesh* _mesh) {
 		printf("Failed to load texture!\n");
 	}
 }
-void Mesh_LoadTexture(Mesh* _mesh, char* _pathToTexture) {
+void Mesh_LoadTexture(Mesh* _mesh, unsigned char* _textureData) {
 	if (_mesh->textures == NULL) {
 		_mesh->textures = (Texture*)malloc(sizeof(Texture) * 4);
 		_mesh->textureSize = 4;
