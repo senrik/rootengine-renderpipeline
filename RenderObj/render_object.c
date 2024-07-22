@@ -242,7 +242,23 @@ void RenderObj_Init(RenderObj* _obj) {
 	Shader_Empty_Init(&_obj->objShader);
 }
 
-void RenderObj_AddMesh(RenderObj* _obj,const float* verts, unsigned int _vertCount, unsigned int* indices, unsigned int _indicesCount) {
+void RenderObj_AddMesh(RenderObj* _obj, Mesh* _mesh) {
+	if (_obj->objMeshes == NULL) {
+		_obj->objMeshes = (Mesh*)malloc(sizeof(Mesh) * MESHES_PER_RENDEROBJ);
+		_obj->meshesCount = 0;
+	}
+
+	if (_obj->meshesCount + 1 < MESHES_PER_RENDEROBJ) {
+		_obj->objMeshes[_obj->meshesCount] = *_mesh;
+
+		_obj->meshesCount++;
+	}
+	else {
+		printf("ERROR::RENDEROBJ::MAX_MESHES_REACHED");
+	}
+}
+
+void RenderObj_Add_Raw_Mesh(RenderObj* _obj,const float* verts, unsigned int _vertCount, unsigned int* indices, unsigned int _indicesCount) {
 	if (_obj->objMeshes == NULL) {
 		_obj->objMeshes = (Mesh*)malloc(sizeof(Mesh) * MESHES_PER_RENDEROBJ);
 		_obj->meshesCount = 0;

@@ -84,7 +84,8 @@ void Mesh_Terminate(Mesh*);
 
 void RenderObj_ReadFBX(RenderObj*, const char*);
 void RenderObj_Init(RenderObj*);
-void RenderObj_AddMesh(RenderObj*, const float* verts, unsigned int _vertCount, unsigned int* indices, unsigned int _indicesCount);
+void RenderObj_AddMesh(RenderObj*,Mesh*);
+void RenderObj_Add_Raw_Mesh(RenderObj*, const float* verts, unsigned int _vertCount, unsigned int* indices, unsigned int _indicesCount);
 void RenderObj_Register(RenderObj*);
 void RenderObj_Draw(RenderObj*);
 void RenderObj_Terminate(RenderObj*);
