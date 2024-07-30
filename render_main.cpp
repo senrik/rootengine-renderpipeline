@@ -3,7 +3,9 @@
 #include <Camera.h>
 #include <asset_io.h>
 #include <render_cache.h>
+#include <glad/glad.h>
 #include <glfw3.h>
+
 
 #pragma region Callback functions Prototypes
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
@@ -35,6 +37,16 @@ int main(int argc, char* argv[]) {
 	RenderObj_Init(&plane);
 	
 	RenderObj_Add_Raw_Mesh(&plane, defaultPlaneVerts, DEFAULT_PLANE_VERT_COUNT, defaultPlaneIndices, DEFAULT_PLANE_VERT_COUNT);
+	Texture* _tex = Mesh_GetTexture(&plane.objMeshes[0], 0);
+	_tex->textureData = load_image("./assets/container.jpg", &_tex->t_width, &_tex->t_height, &_tex->nrChannels, 0);
+	rt_string _vertCode, _fragCode;
+	rt_string_init(&_vertCode);
+	rt_string_init(&_fragCode);
+	read_textfile(&_vertCode, "./assets/shaders/diffuse_texture.vertshader");
+	//printf("Vertex Shader Code:\n============================================\n%s\n", _vertCode.data);
+	read_textfile(&_fragCode, "./assets/shaders/diffuse_texture.fragshader");
+	//printf("Fragment Shader Code:\n============================================\n%s\n", _fragCode.data);
+	Shader_Init(&plane.objShader, &_vertCode, &_fragCode);
 	RenderObj_Register(&plane);
 	float deltaTime = 0;
 	while (!glfwWindowShouldClose(window)) {
@@ -58,8 +70,8 @@ int main(int argc, char* argv[]) {
 		RenderObj_Draw(&plane);
 		// glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
 		// -------------------------------------------------------------------------------
-		glfwSwapBuffers(window);
 		glfwPollEvents();
+		glfwSwapBuffers(window);
 		// Update delta time
 		deltaTime = timeValue;
 	}
@@ -88,7 +100,7 @@ int RenderPipeline_BP() {
 		return -1;
 	}
 	glfwMakeContextCurrent(window);
-
+	
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
 		printf("Failed to initialize GLAD.\n");
 		return -1;

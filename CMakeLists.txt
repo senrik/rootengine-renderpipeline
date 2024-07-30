@@ -6,11 +6,18 @@ target_link_libraries(camera roots_math)
 
 add_library(render_obj STATIC "${CMAKE_CURRENT_SOURCE_DIR}/RenderObj/render_object.c")
 target_include_directories(render_obj PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/RenderObj/include/")
-target_link_libraries(render_obj roots_math data_types glad)
+target_link_libraries(render_obj roots_math data_struct glad)
 
 add_library(render_cache STATIC "${CMAKE_CURRENT_SOURCE_DIR}/RenderCache/render_cache.c")
 target_include_directories(render_cache PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/RenderCache/include/")
 target_link_libraries(render_cache render_obj)
+
+if(EXISTS "${CMAKE_CURRENT_BINARY_DIR}/assets/")
+	message("[Render Pipeline] Assets exists, re-importing...")
+	file(REMOVE_RECURSE "${CMAKE_CURRENT_BINARY_DIR}/assets/")
+endif()
+
+file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/assets/" DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/assets/")
 
 add_executable(render_main "${CMAKE_CURRENT_SOURCE_DIR}/render_main.cpp")
 target_link_libraries(render_main glad glfw "${CMAKE_SOURCE_DIR}/Tools/third_party/lib/glfw3.lib" asset_io ufbx camera render_cache)

@@ -2,14 +2,15 @@
 #define RENDER_OBJECT_H
 #include <stdlib.h>
 #include <roots_math.h>
-#include <data_types.h>
+#include <data_struct.h>
 #include <glad/glad.h>
 #ifdef __cplusplus
 extern "C" {
 #endif
-
+	// This will be updated in the future to account for PBR rendering, for now it is diffuse and normal maps
+#define TEXTURES_PER_MESH 2
 typedef struct Shader {
-	uint ID;
+	RTuint ID, vertexLength, fragLength;
 } Shader;
 
 typedef struct Vertex {
@@ -26,32 +27,32 @@ typedef struct Texture {
 
 typedef struct Mesh {
 
-	uint totalSpan;
+	RTuint totalSpan;
 	// temporary buffer
 	Vertex* vertices;
-	uint vertCount;
-	uint vertSize;
+	RTuint vertCount;
+	RTuint vertSize;
 	// temporary buffer
-	uint* indices;
-	uint indicesCount;
-	uint indicesSize;
+	RTuint* indices;
+	RTuint indicesCount;
+	RTuint indicesSize;
 	// temporary buffer
-	Texture* textures;
-	uint textureCount;
-	uint textureSize;
+	Texture* textures;// diffuse, normal, specular map, metallic map, roughness, transparency
+	RTuint textureCount;
+	RTuint textureSize;
 
-	uint materialIndex;
-	uint VBO, VAO, EBO, texture;
+	RTuint materialIndex;
+	RTuint VBO, VAO, EBO, texture;
 	
 	float* rawVertices;
-	uint rawVertCount;
-	uint rawVertSize;
+	RTuint rawVertCount;
+	RTuint rawVertSize;
 } Mesh;
 
 typedef struct RenderObj {
 
 	Mesh* objMeshes;
-	uint meshesCount;
+	RTuint meshesCount;
 	// shader
 	Shader objShader;
 	// world space coordinates
@@ -62,22 +63,23 @@ typedef struct RenderObj {
 } RenderObj;
 
 void Shader_Empty_Init(Shader*);
-void Shader_Init(Shader*, const char*, const char*);
+void Shader_Init(Shader*, rt_string*, rt_string*);
 void Shader_Use(const Shader*);
-void Shader_setBool(const Shader*, const char*, const uint, const uint ); // last param is a a boolean
-void Shader_setInt(const Shader*, const char*, const uint, const int );
-void Shader_setFloat(const Shader*, const char*, const uint, const float );
-void Shader_setMat4(const Shader*, const char*, const uint, const rt_mat4 );
+void Shader_setBool(const Shader*, const char*, const RTuint, const RTuint ); // last param is a a boolean
+void Shader_setInt(const Shader*, const char*, const RTuint, const int );
+void Shader_setFloat(const Shader*, const char*, const RTuint, const float );
+void Shader_setMat4(const Shader*, const char*, const RTuint, const rt_mat4 );
+char* Shader_getSource(const Shader*);
 void Shader_Terminate(const Shader*);
 
-void Texture_Init(Texture*, const unsigned char*);
+void Texture_Empty_Init(Texture*);
 void Texture_Terminate(Texture*);
 
-// Mesh_init >> Mesh_RawVertsInit >> Mesh_LoadTexture >> Mesh_Register
+// Mesh_init >> Mesh_RawVertsInit >> asset_io load_texture >> Mesh_Register
 void Mesh_Empty_Init(Mesh*);
 void Mesh_Init(Mesh*, const float* verts, unsigned int _vertCount, unsigned int* indices, unsigned int _indicesCount);
 void Mesh_Draw(Mesh*);
-void Mesh_LoadTexture(Mesh*, const unsigned char*);
+Texture* Mesh_GetTexture(Mesh*, RTuint);
 void Mesh_Register(Mesh*);
 void Mesh_RawVertsInit(Mesh*);
 void Mesh_Terminate(Mesh*);
@@ -89,6 +91,7 @@ void RenderObj_Add_Raw_Mesh(RenderObj*, const float* verts, unsigned int _vertCo
 void RenderObj_Register(RenderObj*);
 void RenderObj_Draw(RenderObj*);
 void RenderObj_Terminate(RenderObj*);
+unsigned char* RenderObj_Serialize(RenderObj*);
 
 #ifdef __cplusplus
 }

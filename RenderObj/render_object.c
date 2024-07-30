@@ -3,17 +3,20 @@
 
 void Shader_Empty_Init(Shader* _shader) {
 	_shader->ID = -1;
+	_shader->vertexLength = 0;
+	_shader->fragLength = 0;
 }
 
-void Shader_Init(Shader* _shader, const char* vertexCode, const char* fragmentCode) {
+void Shader_Init(Shader* _shader, rt_string* vertexCode, rt_string* fragmentCode) {
 
-
+	_shader->vertexLength = vertexCode->length;
+	_shader->fragLength = fragmentCode->length;
 	unsigned int vertex, fragment;
 	int success;
 	char infoLog[512];
 	
 	vertex = glCreateShader(GL_VERTEX_SHADER);
-	glShaderSource(vertex, 1, vertexCode, NULL);
+	glShaderSource(vertex, 1, &vertexCode->data, NULL);
 	glCompileShader(vertex);
 	glGetShaderiv(vertex, GL_COMPILE_STATUS, &success);
 	if (!success) {
@@ -22,7 +25,7 @@ void Shader_Init(Shader* _shader, const char* vertexCode, const char* fragmentCo
 	}
 
 	fragment = glCreateShader(GL_FRAGMENT_SHADER);
-	glShaderSource(fragment, 1, fragmentCode, NULL);
+	glShaderSource(fragment, 1, &fragmentCode->data, NULL);
 	glCompileShader(fragment);
 	glGetShaderiv(fragment, GL_COMPILE_STATUS, &success);
 	if (!success) {
@@ -48,20 +51,26 @@ void Shader_Use(const Shader* _shader) {
 	glUseProgram(_shader->ID);
 }
 
-void Shader_setBool(const Shader* _shader, const char* name, const uint _nameLen, const uint value) {
+void Shader_setBool(const Shader* _shader, const char* name, const RTuint _nameLen, const RTuint value) {
 	glUniform1i(glGetUniformLocation(_shader->ID, name), (int)value);
 }
 
-void Shader_setInt(const Shader* _shader, const char* name, const uint _nameLen, int value){
+void Shader_setInt(const Shader* _shader, const char* name, const RTuint _nameLen, int value){
 	glUniform1i(glGetUniformLocation(_shader->ID, name), value);
 }
 
-void Shader_setFloat(const Shader* _shader, const char* name, const uint _nameLen, float value) {
+void Shader_setFloat(const Shader* _shader, const char* name, const RTuint _nameLen, float value) {
 	glUniform1f(glGetUniformLocation(_shader->ID, name), value);
 }
 
-void Shader_setMat4(const Shader* _shader, const char* name, const uint _nameLen, const rt_mat4 value) {
+void Shader_setMat4(const Shader* _shader, const char* name, const RTuint _nameLen, const rt_mat4 value) {
 	glUniformMatrix4fv(glGetUniformLocation(_shader->ID, name), 1, GL_FALSE, &value.cols[0].v[0]);
+}
+
+char* Shader_getSource(const Shader* _shader) {
+	char* out;
+	glGetShaderSource(_shader->ID, 512, _shader->vertexLength + _shader->fragLength, out);
+	return out;
 }
 
 void Shader_Terminate(const Shader* _shader) {
@@ -90,7 +99,7 @@ void Mesh_RawVertsInit(Mesh* _mesh) {
 		_mesh->rawVertices[ri + 7] = _mesh->vertices[j].normal.z;
 	}
 
-	free(_mesh->vertices);
+	//free(_mesh->vertices);
 	//free(_mesh->indices);
 }
 
@@ -105,9 +114,12 @@ void Mesh_Empty_Init(Mesh* _mesh) {
 	_mesh->rawVertices = 0;
 	_mesh->rawVertCount = 0;
 	_mesh->rawVertSize = 0;
-	_mesh->textures = 0;
+	_mesh->textures = (Texture*)malloc(sizeof(Texture) * TEXTURES_PER_MESH);
+	for (int i = 0; i < TEXTURES_PER_MESH; i++) {
+		Texture_Empty_Init(&_mesh->textures[i]);
+	}
 	_mesh->textureCount = 0;
-	_mesh->textureSize = 0;
+	_mesh->textureSize = TEXTURES_PER_MESH;
 }
 
 
@@ -116,8 +128,8 @@ void Mesh_Init(Mesh* _mesh, const float* verts, unsigned int _vertCount, unsigne
 	
 	_mesh->totalSpan= 8;
 	_mesh->indicesCount = _indicesCount;
-	_mesh->indicesSize = sizeof(uint) * _mesh->indicesCount;
-	_mesh->indices = (uint*)malloc(_mesh->indicesSize);
+	_mesh->indicesSize = sizeof(RTuint) * _mesh->indicesCount;
+	_mesh->indices = (RTuint*)malloc(_mesh->indicesSize);
 	for (int i = 0; i < _mesh->indicesCount; i++) {
 		_mesh->indices[i] = indices[i];
 	}
@@ -139,9 +151,9 @@ void Mesh_Init(Mesh* _mesh, const float* verts, unsigned int _vertCount, unsigne
 		_mesh->vertices[vi / _mesh->totalSpan].normal.z = verts[vi + 7];
 	}
 
-	_mesh->textures = 0;
+	_mesh->textures = (Texture*)malloc(sizeof(Texture)*TEXTURES_PER_MESH);
 	_mesh->textureCount = 0;
-	_mesh->textureSize = 0;
+	_mesh->textureSize = TEXTURES_PER_MESH;
 }
 
 void Mesh_Register(Mesh* _mesh) {
@@ -172,7 +184,7 @@ void Mesh_Register(Mesh* _mesh) {
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
-
+	// DIFFUSE TEXTURE
 	if (_mesh->textures[0].textureData != NULL) {
 		glGenTextures(1, &_mesh->texture);
 		glBindTexture(GL_TEXTURE_2D, _mesh->texture);
@@ -185,16 +197,8 @@ void Mesh_Register(Mesh* _mesh) {
 		glGenerateMipmap(GL_TEXTURE_2D);
 	}
 	else {
-		printf("Failed to load texture!\n");
+		printf("WARNING::MESH::NO_DIFFUSE_TEXTURE\n");
 	}
-}
-void Mesh_LoadTexture(Mesh* _mesh, char* _pathToTexture) {
-	if (_mesh->textures == NULL) {
-		_mesh->textures = (Texture*)malloc(sizeof(Texture) * 4);
-		_mesh->textureSize = 4;
-	}
-	
-	_mesh->textureCount++;
 }
 void Mesh_Draw(Mesh* _mesh) {
 	if (_mesh->textureCount > 0) {
@@ -207,10 +211,27 @@ void Mesh_Draw(Mesh* _mesh) {
 		glDrawArrays(GL_TRIANGLES, 0, _mesh->rawVertCount / _mesh->totalSpan);
 	}
 }
+
+Texture* Mesh_GetTexture(Mesh* _mesh, RTuint i) {
+	if (i < _mesh->textureSize) {
+		return &_mesh->textures[i];
+	}
+	else {
+		printf("ERROR::MESH::TEXTURE_INDEX::OUT_OF_BOUNDS");
+		return NULL;
+	}
+}
 void Mesh_Terminate(Mesh* _mesh) {
-	free(_mesh->vertices);
-	free(_mesh->indices);
-	free(_mesh->textures);
+	if (_mesh->vertices != NULL) {
+		free(_mesh->vertices);
+	}
+	if (_mesh->indices != NULL) {
+		free(_mesh->indices);
+	}
+	if (_mesh->textures != NULL) {
+		free(_mesh->textures);
+	}
+	
 
 	glDeleteBuffers(1, &_mesh->VBO);
 	glDeleteBuffers(1, &_mesh->VAO);
@@ -220,8 +241,11 @@ void Mesh_Terminate(Mesh* _mesh) {
 #pragma endregion
 
 #pragma region Texture
-void Texture_Init(Texture* _texture, const unsigned char* _textureData) {
-	_texture->textureData = _textureData;
+void Texture_Empty_Init(Texture* _tex) {
+	_tex->t_height = 0;
+	_tex->t_width = 0;
+	_tex->nrChannels = 0;
+	_tex->textureData = NULL;
 }
 
 void Texture_Terminate(Texture* _texture) {
@@ -236,8 +260,12 @@ void RenderObj_Init(RenderObj* _obj) {
 	_obj->meshesCount = 0;
 	if (_obj->meshesCount > 0) {
 		free(_obj->objMeshes);
-		_obj->meshesCount = 0;
-		_obj->objMeshes = (Mesh*)malloc(sizeof(Mesh) * MESHES_PER_RENDEROBJ);
+	}
+	
+	_obj->objMeshes = (Mesh*)malloc(sizeof(Mesh) * MESHES_PER_RENDEROBJ);
+	_obj->meshesCount = 0;
+	for (int i = 0; i < MESHES_PER_RENDEROBJ; i++) {
+		Mesh_Empty_Init(&_obj->objMeshes[i]);
 	}
 	Shader_Empty_Init(&_obj->objShader);
 }
@@ -265,7 +293,7 @@ void RenderObj_Add_Raw_Mesh(RenderObj* _obj,const float* verts, unsigned int _ve
 	}
 	if (_obj->meshesCount + 1 <  MESHES_PER_RENDEROBJ) {
 		Mesh_Init(&_obj->objMeshes[_obj->meshesCount], verts, _vertCount, indices, _indicesCount);
-		//Mesh_LoadTexture(&_obj->objMeshes[_obj->meshesCount], "./assets/container.jpg");
+		Mesh_RawVertsInit(&_obj->objMeshes[_obj->meshesCount]);
 		_obj->meshesCount++;
 	} else {
 		printf("ERROR::RENDEROBJ::MAX_MESHES_REACHED");
@@ -283,7 +311,7 @@ void RenderObj_Register(RenderObj* _obj) {
 }
 
 void RenderObj_Draw(RenderObj* _obj) {
-	//_obj->objShader.use();
+	Shader_Use(&_obj->objShader);
 	if (_obj->meshesCount > 0) {
 		for (size_t i = 0; i < _obj->meshesCount; i++) {
 			Mesh_Draw(&_obj->objMeshes[i]);
@@ -299,5 +327,11 @@ void RenderObj_Terminate(RenderObj* _obj) {
 	free(_obj->objMeshes);
 	Shader_Terminate(&_obj->objShader);
 	
+}
+
+unsigned char* RenderObj_Serialize(RenderObj* _obj) {
+	// TODO
+	
+	return NULL;
 }
 #pragma endregion
