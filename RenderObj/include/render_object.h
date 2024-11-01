@@ -1,6 +1,7 @@
 #ifndef RENDER_OBJECT_H
 #define RENDER_OBJECT_H
 #include <stdlib.h>
+#include <stdio.h>
 #include <roots_math.h>
 #include <data_struct.h>
 #include <glad/glad.h>

@@ -16,7 +16,7 @@ void Shader_Init(Shader* _shader, rt_string* vertexCode, rt_string* fragmentCode
 	char infoLog[512];
 	
 	vertex = glCreateShader(GL_VERTEX_SHADER);
-	glShaderSource(vertex, 1, &vertexCode->data, NULL);
+	glShaderSource(vertex, 1, (const char* const*)vertexCode->data, NULL);
 	glCompileShader(vertex);
 	glGetShaderiv(vertex, GL_COMPILE_STATUS, &success);
 	if (!success) {
@@ -25,7 +25,7 @@ void Shader_Init(Shader* _shader, rt_string* vertexCode, rt_string* fragmentCode
 	}
 
 	fragment = glCreateShader(GL_FRAGMENT_SHADER);
-	glShaderSource(fragment, 1, &fragmentCode->data, NULL);
+	glShaderSource(fragment, 1, (const char* const*)fragmentCode->data, NULL);
 	glCompileShader(fragment);
 	glGetShaderiv(fragment, GL_COMPILE_STATUS, &success);
 	if (!success) {
