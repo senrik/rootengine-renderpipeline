@@ -11,7 +11,7 @@ extern "C" {
 	// This will be updated in the future to account for PBR rendering, for now it is diffuse and normal maps
 #define TEXTURES_PER_MESH 2
 typedef struct Shader {
-	RTuint ID, vertexLength, fragLength;
+	int ID, vertexLength, fragLength;
 } Shader;
 
 typedef struct Vertex {

@@ -111,6 +111,7 @@ int RenderPipeline_BP() {
 
 	mainCamera = (Camera*)malloc(sizeof(Camera));
 	Camera_Init(mainCamera);
+	return 0;
 }
 
 void processInput(GLFWwindow* window, float deltaTime) {

@@ -69,7 +69,9 @@ void Shader_setMat4(const Shader* _shader, const char* name, const RTuint _nameL
 
 char* Shader_getSource(const Shader* _shader) {
 	char* out;
-	glGetShaderSource(_shader->ID, 512, _shader->vertexLength + _shader->fragLength, out);
+	int _shaderLength = _shader->vertexLength + _shader->fragLength;
+	
+	glGetShaderSource(_shader->ID, 512, &(_shaderLength), out);
 	return out;
 }
 
