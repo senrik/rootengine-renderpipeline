@@ -4,7 +4,7 @@
 #include <asset_io.h>
 #include <render_cache.h>
 #include <glad/glad.h>
-#include <glfw3.h>
+#include <GLFW/glfw3.h>
 
 
 #pragma region Callback functions Prototypes

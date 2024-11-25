@@ -20,4 +20,4 @@ endif()
 file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/assets/" DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/assets/")
 
 add_executable(render_main "${CMAKE_CURRENT_SOURCE_DIR}/render_main.cpp")
-target_link_libraries(render_main glad glfw "${CMAKE_SOURCE_DIR}/Tools/third_party/lib/glfw3.lib" asset_io ufbx camera render_cache)
+target_link_libraries(render_main glad glfw MY_GLFW_LIB asset_io ufbx camera render_cache)
