@@ -1,0 +1,3 @@
+[submodule "rootengine-tools"]
+	path = rootengine-tools
+	url = git@github.com:senrik/rootengine-tools.git
