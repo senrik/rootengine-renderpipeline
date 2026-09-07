@@ -1,4 +1,11 @@
 # Render Pipeline CMake
+if(DEFINED COMPOUND_PROJECT)
+else()
+	cmake_minimum_required(VERSION 3.20)
+	project(render_pipeline)
+endif()
+
+add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/rootengine-tools/")
 
 add_library(camera STATIC "${CMAKE_CURRENT_SOURCE_DIR}/Camera/Camera.c")
 target_include_directories(camera PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/Camera/include/")
@@ -19,5 +26,9 @@ endif()
 
 file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/assets/" DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/assets/")
 
-add_executable(render_main "${CMAKE_CURRENT_SOURCE_DIR}/render_main.cpp")
-target_link_libraries(render_main glad glfw MY_GLFW_LIB asset_io ufbx camera render_cache)
+if(DEFINED COMPOUND_PROJECT)
+else()
+	add_executable(render_main "${CMAKE_CURRENT_SOURCE_DIR}/render_main.cpp")
+	target_link_libraries(render_main glad glfw MY_GLFW_LIB asset_io ufbx camera render_cache)
+endif()
+
